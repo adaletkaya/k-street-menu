@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <title>K-Street Lezzetleri | QR Menü</title>
+
+    <!-- Fontlar -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==========================================
+           01. ANA RENKLER VE TİPOGRAFİ (VARIABLES)
+           ========================================== */
+        :root {
+          --bg-night: #15161f;
+          --bg-panel: #1d1f2e;
+          --bg-card: #242637;
+          --line: #33364a;
+          --neon-pink: #ff3e7f;
+          --neon-teal: #00e5c7;
+          --gold: #ffc857;
+          --ivory: #f5f0e8;
+          --muted: #9a97ae;
+          --display: 'Baloo 2', system-ui, sans-serif;
+          --body: 'Be Vietnam Pro', system-ui, sans-serif;
+          --mono: 'JetBrains Mono', monospace;
+        }
+
+        /* ==========================================
+           02. GENEL SIFIRLAMA VE ARKA PLAN (GLOBAL)
+           ========================================== */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+          background:
+            radial-gradient(ellipse at 20% -10%, rgba(255,62,127,0.16), transparent 45%),
+            radial-gradient(ellipse at 90% 0%, rgba(0,229,199,0.12), transparent 40%),
+            var(--bg-night);
+          color: var(--ivory);
+          font-family: var(--body);
+          padding-bottom: 56px;
+          -webkit-font-smoothing: antialiased;
+        }
+
+        a { color: inherit; }
+
+        /* Keyframe Animasyonu (Titreme Efekti) */
+        @keyframes flicker {
+          0%, 3%, 6%, 100% { opacity: 1; }
+          4% { opacity: .72; }
+          5% { opacity: .95; }
+        }
+
+        /* ==========================================
+           03. HERO / BAŞLIK ALANI CLASS'LARI
+           ========================================== */
+        /* Ana Üst Kutu */
+        .hero {
+          position: relative;
+          padding: 44px 20px 28px;
+          text-align: center;
+          overflow: hidden;
+          border-bottom: 1px solid var(--line);
+        }
+        .hero::before {
+          content: "";
+          position: absolute; inset: 0;
+          background-image: repeating-linear-gradient(90deg, rgba(255,255,255,0.025) 0 1px, transparent 1px 26px);
+          pointer-events: none;
+        }
+
+        /* Küçük Üst Tanıtım Metni */
+        .hero-eyebrow {
+          font-family: var(--mono);
+          font-size: 11px;
+          letter-spacing: .28em;
+          text-transform: uppercase;
+          color: var(--neon-teal);
+          margin-bottom: 14px;
+        }
+
+        /* Dev Neon Başlık */
+        .hero-title {
+          font-family: var(--display);
+          font-weight: 800;
+          font-size: clamp(2.1rem, 9vw, 3.2rem);
+          line-height: 1;
+          letter-spacing: .01em;
+          color: var(--ivory);
+          text-shadow:
+            0 0 6px rgba(255,62,127,.55),
+            0 0 22px rgba(255,62,127,.35),
+            0 0 44px rgba(255,62,127,.18);
+          animation: flicker 6s infinite;
+        }
+        .hero-title span { color: var(--neon-pink); }
+
+        /* Sarı Slogan Metni */
+        .hero-slogan {
+          margin-top: 14px;
+          font-family: var(--display);
+          font-weight: 600;
+          font-size: clamp(1rem, 4.4vw, 1.25rem);
+          color: var(--gold);
+          letter-spacing: .02em;
+        }
+
+        /* Alt Gri Açıklama Metni */
+        .hero-sub {
+          margin-top: 10px;
+          font-size: 13px;
+          color: var(--muted);
+        }
+
+        /* ==========================================
+           04. KATEGORİ MENÜSÜ CLASS'LARI
+           ========================================== */
+        /* Yatay Kaydırılabilir Yapışkan Bar */
+        .cat-nav {
+          position: sticky;
+          top: 0;
+          z-index: 20;
+          display: flex;
+          gap: 10px;
+          overflow-x: auto;
+          padding: 16px 16px 12px;
+          background: rgba(21,22,31,0.92);
+          backdrop-filter: blur(8px);
+          border-bottom: 1px solid var(--line);
+          scrollbar-width: none;
+        }
+        .cat-nav::-webkit-scrollbar { display: none; }
+
+        /* Standart Kategori Butonu */
+        .cat-btn {
+          position: relative;
+          flex: 0 0 auto;
+          font-family: var(--display);
+          font-weight: 700;
+          font-size: 14.5px;
+          color: var(--muted);
+          background: var(--bg-panel);
+          border: 1px solid var(--line);
+          border-radius: 8px;
+          padding: 11px 18px 10px;
+          cursor: pointer;
+          transition: transform .15s ease, color .15s ease, border-color .15s ease, background .15s ease;
+        }
+        /* Buton İpi Görünümü */
+        .cat-btn::before {
+          content: "";
+          position: absolute;
+          top: -7px; left: 50%;
+          width: 2px; height: 7px;
+          background: var(--line);
+          transform: translateX(-50%);
+        }
+        .cat-btn:active { transform: translateY(1px); }
+
+        /* Aktif/Seçili Kategori Butonu */
+        .cat-btn.active {
+          color: var(--bg-night);
+          background: var(--neon-teal);
+          border-color: var(--neon-teal);
+          box-shadow: 0 0 16px rgba(0,229,199,.45);
+        }
+        .cat-btn.active::before { background: var(--neon-teal); }
+
+        /* ==========================================
+           05. ANA İÇERİK VE GRID CLASS'LARI
+           ========================================== */
+        /* Ana İçerik Kapsayıcısı */
+        .menu {
+          padding: 26px 16px 8px;
+          max-width: 760px;
+          margin: 0 auto;
+        }
+
+        /* Kategori Bölümü (Açık/Kapalı Durumu) */
+        .section { display: none; animation: fadeIn .3s ease; }
+        .section.active { display: block; }
+
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(6px); }
+          to { opacity: 1; transform: none; }
+        }
+
+        /* Bölüm Başlığı Düzeni */
+        .section-head {
+          display: flex;
+          align-items: baseline;
+          gap: 10px;
+          margin-bottom: 16px;
+          padding-bottom: 10px;
+          border-bottom: 1px dashed var(--line);
+        }
+        .section-head h2 {
+          font-family: var(--display);
+          font-weight: 800;
+          font-size: 22px;
+          color: var(--neon-pink);
+        }
+
+        /* Korece Harf Stili */
+        .kr {
+          font-family: var(--mono);
+          font-size: 12px;
+          color: var(--muted);
+        }
+
+        /* Kart Izgara Sistemi (Grid) */
+        .grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 14px;
+        }
+        @media (min-width: 560px) {
+          .grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        /* ==========================================
+           06. YEMEK KARTI (CARD) CLASS'LARI
+           ========================================== */
+        /* Ana Kart Kutusu */
+        .card {
+          background: var(--bg-card);
+          border: 1px solid var(--line);
+          border-radius: 14px;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          transition: border-color .2s ease, transform .2s ease;
+        }
+        .card:hover {
+          border-color: var(--neon-teal);
+          transform: translateY(-2px);
+        }
+
+        /* Görsel/Fotoğraf Alanı */
+        .card-photo {
+          aspect-ratio: 4/3;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 34px;
+          background:
+            linear-gradient(135deg, rgba(255,62,127,.22), rgba(0,229,199,.16)),
+            repeating-linear-gradient(45deg, rgba(255,255,255,.035) 0 10px, transparent 10px 20px);
+          color: var(--muted);
+          position: relative;
+        }
+
+        /* Fotoğraf Etiketi (Sol Üst) */
+        .tag {
+          position: absolute;
+          top: 10px; left: 10px;
+          font-family: var(--mono);
+          font-size: 9.5px;
+          letter-spacing: .08em;
+          text-transform: uppercase;
+          color: var(--ivory);
+          background: rgba(0,0,0,.4);
+          padding: 3px 7px;
+          border-radius: 5px;
+        }
+
+        /* Kart İçi Metin Kapsayıcısı */
+        .card-body {
+          padding: 14px 14px 16px;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          flex: 1;
+        }
+
+        /* Yemek Başlığı */
+        .card-name {
+          font-family: var(--display);
+          font-weight: 700;
+          font-size: 16.5px;
+          color: var(--ivory);
+        }
+
+        /* Yemek Açıklaması */
+        .card-desc {
+          font-size: 13px;
+          line-height: 1.5;
+          color: var(--muted);
+          flex: 1;
+        }
+
+        /* Alt Kısım (Fiyat ve Acılık Yan Yana) */
+        .card-footer {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-top: 8px;
+        }
+
+        /* Fiyat Kutusu */
+        .card-price {
+          font-family: var(--mono);
+          font-weight: 700;
+          font-size: 15px;
+          color: var(--gold);
+          background: rgba(255,200,87,.08);
+          border: 1px solid rgba(255,200,87,.35);
+          padding: 4px 10px;
+          border-radius: 7px;
+        }
+
+        /* Acılık / Özellik Etiketi */
+        .spice {
+          font-size: 12px;
+          color: var(--neon-pink);
+          letter-spacing: .04em;
+        }
+
+        /* ==========================================
+           07. FOOTER CLASS'I
+           ========================================== */
+        footer {
+          text-align: center;
+          margin-top: 34px;
+          padding: 20px;
+          color: var(--muted);
+          font-size: 11.5px;
+          font-family: var(--mono);
+          letter-spacing: .04em;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 01. HERO SECTION -->
+<header class="hero">
+    <div class="hero-eyebrow">서울 스트리트 · SEOUL STREET FOOD</div>
+    <h1 class="hero-title">K-Street <span>Lezzetleri</span></h1>
+    <p class="hero-slogan">Soju Seni Bekliyor!</p>
+    <p class="hero-sub">Dijital menü · Kategoriyi seç, lezzeti keşfet</p>
+</header>
+
+<!-- 02. NAV -->
+<nav class="cat-nav" id="catNav">
+    <button class="cat-btn active" data-target="bibimbap">Bibimbap</button>
+    <button class="cat-btn" data-target="kimchi">Kimchi</button>
+    <button class="cat-btn" data-target="icecekler">İçecekler</button>
+    <button class="cat-btn" data-target="tatlilar">Tatlılar</button>
+</nav>
+
+<!-- 03. MENU CONTENT -->
+<main class="menu">
+
+    <!-- SECTION: BIBIMBAP -->
+    <section class="section active" id="bibimbap">
+        <div class="section-head">
+            <h2>Bibimbap</h2>
+            <span class="kr">비빔밥</span>
+        </div>
+        <div class="grid">
+
+            <article class="card">
+                <div class="card-photo"><span class="tag">Foto Alanı</span>🍚</div>
+                <div class="card-body">
+                    <h3 class="card-name">Klasik Dolsot Bibimbap</h3>
+                    <p class="card-desc">Sıcak taş kâsede pirinç, mevsim sebzeleri, çıtır yumurta ve gochujang sos.</p>
+                    <div class="card-footer">
+                        <span class="card-price">₺240</span>
+                        <span class="spice">🌶️ Orta</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="card-photo"><span class="tag">Foto Alanı</span>🥩</div>
+                <div class="card-body">
+                    <h3 class="card-name">Bulgogi Bibimbap</h3>
+                    <p class="card-desc">Marine edilmiş dana bulgogi, ızgara sebzeler ve susamlı pirinç üzerine.</p>
+                    <div class="card-footer">
+                        <span class="card-price">₺275</span>
+                        <span class="spice">🌶️ Hafif</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="card-photo"><span class="tag">Foto Alanı</span>🥦</div>
+                <div class="card-body">
+                    <h3 class="card-name">Vejetaryen Bibimbap</h3>
+                    <p class="card-desc">Tofu, ıspanak, havuç, kabak ve mantar ile hazırlanan bitkisel seçenek.</p>
+                    <div class="card-footer">
+                        <span class="card-price">₺215</span>
+                        <span class="spice">🌶️ Hafif</span>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+    </section>
+
+    <!-- SECTION: KIMCHI -->
+    <section class="section" id="kimchi">
+        <div class="section-head">
+            <h2>Kimchi</h2>
+            <span class="kr">김치</span>
+        </div>
+        <div class="grid">
+
+            <article class="card">
+                <div class="card-photo"><span class="tag">Foto Alanı</span>🥬</div>
+                <div class="card-body">
+                    <h3 class="card-name">Geleneksel Napa Kimchi</h3>
+                    <p class="card-desc">Ev yapımı, fermente Çin lahanası; acı ve ekşi dengesiyle klasik lezzet.</p>
+                    <div class="card-footer">
+                        <span class="card-price">₺95</span>
+                        <span class="spice">🌶️ Orta</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="card-photo"><span class="tag">Foto Alanı</span>🫕</div>
+                <div class="card-body">
+                    <h3 class="card-name">Kimchi Jjigae</h3>
+                    <p class="card-desc">Kaynar kimchi güveci, domuz eti, tofu ve taze soğan ile servis edilir.</p>
+                    <div class="card-footer">
+                        <span class="card-price">₺230</span>
+                        <span class="spice">🌶️ Yüksek</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="card-photo"><span class="tag">Foto Alanı</span>🥒</div>
+                <div class="card-body">
+                    <h3 class="card-name">Oi-Kimchi (Salatalık)</h3>
+                    <p class="card-desc">Taze salatalıktan yapılan hafif ve ferahlatıcı fermente atıştırmalık.</p>
+                    <div class="card-footer">
+                        <span class="card-price">₺85</span>
+                        <span class="spice">🌶️ Hafif</span>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+    </section>
+
+    <!-- SECTION: İÇECEKLER -->
+    <section class="section" id="icecekler">
+        <div class="section-head">
+            <h2>İçecekler</h2>
+            <span class="kr">음료</span>
+        </div>
+        <div class="grid">
+
+            <article class="card">
+                <div class="card-photo"><span class="tag">Foto Alanı</span>🍶</div>
+                <div class="card-body">
+                    <h3 class="card-name">Klasik Soju</h3>
+                    <p class="card-desc">Kore'nin efsanevi pirinç içkisi, buz gibi soğuk servis edilir.</p>
+                    <div class="card-footer">
+                        <span class="card-price">₺320</span>
+                        <span class="spice">🥃 %16</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="card-photo"><span class="tag">Foto Alanı</span>🍺</div>
+                <div class="card-body">
+                    <h3 class="card-name">Somaek</h3>
+                    <p class="card-desc">Soju ve biranın dengeli karışımı; sosyal masaların favorisi.</p>
+                    <div class="card-footer">
+                        <span class="card-price">₺260</span>
+                        <span class="spice">🥃 %6</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="card-photo"><span class="tag">Foto Alanı</span>🧋</div>
+                <div class="card-body">
+                    <h3 class="card-name">Sujeonggwa</h3>
+                    <p class="card-desc">Tarçın ve zencefil ile demlenen geleneksel soğuk hoşaf.</p>
+                    <div class="card-footer">
+                        <span class="card-price">₺110</span>
+                        <span class="spice">❄️ Alkolsüz</span>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+    </section>
+
+    <!-- SECTION: TATLILAR -->
+    <section class="section" id="tatlilar">
+        <div class="section-head">
+            <h2>Tatlılar</h2>
+            <span class="kr">디저트</span>
+        </div>
+        <div class="grid">
+
+            <article class="card">
+                <div class="card-photo"><span class="tag">Foto Alanı</span>🍡</div>
+                <div class="card-body">
+                    <h3 class="card-name">Bingsu (Kırmızı Fasulye)</h3>
+                    <p class="card-desc">İnce tıraşlanmış buz, tatlı kırmızı fasulye ve mochi parçaları.</p>
+                    <div class="card-footer">
+                        <span class="card-price">₺190</span>
+                        <span class="spice">❄️ Serinletici</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="card-photo"><span class="tag">Foto Alanı</span>🍯</div>
+                <div class="card-body">
+                    <h3 class="card-name">Hotteok</h3>
+                    <p class="card-desc">Kahverengi şeker ve tarçın dolgulu, sıcak servis edilen tatlı gözleme.</p>
+                    <div class="card-footer">
+                        <span class="card-price">₺120</span>
+                        <span class="spice">🔥 Sıcak</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="card-photo"><span class="tag">Foto Alanı</span>🍮</div>
+                <div class="card-body">
+                    <h3 class="card-name">Injeolmi Tiramisu</h3>
+                    <p class="card-desc">Kavrulmuş soya fasulyesi tozuyla harmanlanmış modern füzyon tatlı.</p>
+                    <div class="card-footer">
+                        <span class="card-price">₺165</span>
+                        <span class="spice">✨ Şef Önerisi</span>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+    </section>
+
+</main>
+
+<!-- 04. FOOTER -->
+<footer>K-STREET LEZZETLERİ · GÜNCEL FİYATLAR MENÜDE GEÇERLİDİR</footer>
+
+<!-- 05. JAVASCRIPT -->
+<script>
+    const buttons = document.querySelectorAll('.cat-btn');
+    const sections = document.querySelectorAll('.section');
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        buttons.forEach(b => b.classList.remove('active'));
+        sections.forEach(s => s.classList.remove('active'));
+
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.target).classList.add('active');
+        btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      });
+    });
+</script>
+
+</body>
+</html>
